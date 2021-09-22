@@ -277,6 +277,12 @@ class Connection extends Component
      */
     public $unixSocket;
     /**
+     * @var string the username for establishing DB connection using ACL. Defaults to null meaning "default" username will be used.
+     * ACL is available since Redis 6.0
+     * See https://redis.io/commands/auth
+     */
+    public $username;
+    /**
      * @var string the password for establishing DB connection. Defaults to null meaning no AUTH command is sent.
      * See https://redis.io/commands/auth
      */
@@ -638,7 +644,7 @@ class Connection extends Component
                 stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
             }
             if ($this->password !== null) {
-                $this->executeCommand('AUTH', [$this->password]);
+                $this->executeCommand('AUTH', array_filter([$this->username, $this->password]));
             }
             if ($this->database !== null) {
                 $this->executeCommand('SELECT', [$this->database]);
